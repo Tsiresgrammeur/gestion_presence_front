@@ -13,24 +13,26 @@ import jsPDF from 'jspdf';
 import download from './download.png'
 import QRCode from "qrcode";
 import { useNavigate } from "react-router-dom";
+import domtoimage from 'dom-to-image';
+import html2pdf from 'html2pdf.js'
 
 function Eleve() {
     const initialState = {
         nom: "",
         prenom: "",
-        classe_id: 0,
+        classe_id: 1,
         photo: "",
         libelle: ""
     }
     const [filterText, setFilterText] = useState('');
     const [state, setState] = useState(initialState)
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const { nom, prenom, classe_id, libelle,photo } = state;
+    const { nom, prenom, classe_id, libelle, photo } = state;
     const [eleves, setEleves] = useState([]);
     const [classes, setClasses] = useState([]);
     const [show, setShow] = useState(false);
     const handleClose = () => {
-        setState({ nom: "",prenom:"", classe_id: classes[0]?.id, libelle:"" });
+        setState({ nom: "", prenom: "", classe_id: classes[0]?.id, libelle: "" });
         setShow(false)
     };
     const handleShow = () => setShow(true);
@@ -69,18 +71,16 @@ function Eleve() {
             console.error(error)
         }
     }
- 
+
 
 
     useEffect(() => {
-        if(classes)
-        {
-            setState({...state, classe_id: classes[0]?.id})
+        if (classes) {
+            setState({ ...state, classe_id: classes[0]?.id })
         }
     }, [classes])
-    useEffect(() =>{
-        if(!localStorage.getItem('role'))
-        {
+    useEffect(() => {
+        if (!localStorage.getItem('role')) {
             navigate('/')
         }
     })
@@ -111,22 +111,22 @@ function Eleve() {
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
         if (name === "photo") {
-          setState((prevState) => ({
-            ...prevState,
-            [name]: { file: files[0], filename: "" },
-          }), () => {
-            console.log(state.photo); // Log the updated value in the callback
-          });
+            setState((prevState) => ({
+                ...prevState,
+                [name]: { file: files[0], filename: "" },
+            }), () => {
+                console.log(state.photo); // Log the updated value in the callback
+            });
         } else {
-          setState((prevState) => ({
-            ...prevState,
-            [name]: value,
-          }));
+            setState((prevState) => ({
+                ...prevState,
+                [name]: value,
+            }));
         }
-      };
+    };
 
     const closeEditModal = () => {
-        setState({ libelle: "", classe_id: 0, professeur_id: 0 });
+        setState({ nom: "", prenom: "", classe_id: classes[0]?.id, libelle: "" });
         setShowEdit(false);
     };
 
@@ -143,10 +143,11 @@ function Eleve() {
 
     const showCardModal = async (id) => {
         api.get("/eleve/" + id).then(async (res) => {
-            console.log("res",res.data)
-            await setState({ ...res.data })});
-        console.log("state",state);
-        console.log("uploads",`/uploads/${photo}`);
+            console.log("res", res.data)
+            await setState({ ...res.data })
+        });
+        console.log("state", state);
+        console.log("uploads", `/uploads/${photo}`);
         await generateQrCode(id);
         setShowCard(true);
     }
@@ -176,40 +177,70 @@ function Eleve() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!nom) {
-          toast.error("Complétez les champs!");
+            toast.error("Complétez les champs!");
         } else {
-          try {
-            const formData = new FormData();
-            formData.append("file", state.photo.file);
-            const { data: { filename } } = await api.post("/upload", formData);
-      
-            await api.post('/eleve', {
-              nom,
-              prenom,
-              classe_id,
-              photo: { filename, originalname: state.photo.file.name },
-            });
-      
-            setState({ nom: "", prenom: "", classe_id: 1, photo: null });
-            handleClose();
-            toast.success("Ajout avec succès!");
-            getList();
-          } catch (err) {
-            handleClose();
-            toast.error(err.response.data);
-          }
+            try {
+                const formData = new FormData();
+                formData.append("file", state.photo.file);
+                const { data: { filename } } = await api.post("/upload", formData);
+
+                await api.post('/eleve', {
+                    nom,
+                    prenom,
+                    classe_id,
+                    photo: { filename, originalname: state.photo.file.name },
+                });
+
+                setState({ nom: "", prenom: "", classe_id: 1, photo: null });
+                handleClose();
+                toast.success("Ajout avec succès!");
+                getList();
+            } catch (err) {
+                handleClose();
+                toast.error(err.response.data);
+            }
         }
-      };
-      
+    };
+
+    const cloneTableWithStyles = (originalTable) => {
+        const clonedTable = document.createElement('table');
+        const computedStyles = window.getComputedStyle(originalTable);
+    
+        // Apply computed styles to the cloned table
+        Array.from(computedStyles).forEach((styleName) => {
+            clonedTable.style[styleName] = computedStyles[styleName];
+        });
+    
+        const originalRows = originalTable.querySelectorAll('tr');
+        originalRows.forEach((originalRow) => {
+            const clonedRow = document.createElement('tr');
+            const originalCells = originalRow.querySelectorAll('td');
+    
+            originalCells.forEach((originalCell) => {
+                const clonedCell = document.createElement('td');
+                clonedCell.textContent = originalCell.textContent;
+                clonedRow.appendChild(clonedCell);
+            });
+    
+            clonedTable.appendChild(clonedRow);
+        });
+    
+        return clonedTable;
+    };
+    
+    // Example usage
+
     const captureTable = () => {
         const table = document.getElementById('myTable');
-
-        html2canvas(table, { allowTaint: true, useCORS: true }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 10, 10);
-            pdf.save('table.pdf');
-        });
+    domtoimage.toPng(table)
+    .then(function (dataUrl) {
+        const pdf = new jsPDF();
+        pdf.addImage(dataUrl, 'PNG', 10, 10);
+        pdf.save('table.pdf');
+    })
+    .catch(function (error) {
+        console.error('Error capturing table:', error);
+    });
     };
 
 
