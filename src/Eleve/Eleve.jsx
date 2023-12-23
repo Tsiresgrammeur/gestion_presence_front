@@ -202,33 +202,6 @@ function Eleve() {
         }
     };
 
-    const cloneTableWithStyles = (originalTable) => {
-        const clonedTable = document.createElement('table');
-        const computedStyles = window.getComputedStyle(originalTable);
-    
-        // Apply computed styles to the cloned table
-        Array.from(computedStyles).forEach((styleName) => {
-            clonedTable.style[styleName] = computedStyles[styleName];
-        });
-    
-        const originalRows = originalTable.querySelectorAll('tr');
-        originalRows.forEach((originalRow) => {
-            const clonedRow = document.createElement('tr');
-            const originalCells = originalRow.querySelectorAll('td');
-    
-            originalCells.forEach((originalCell) => {
-                const clonedCell = document.createElement('td');
-                clonedCell.textContent = originalCell.textContent;
-                clonedRow.appendChild(clonedCell);
-            });
-    
-            clonedTable.appendChild(clonedRow);
-        });
-    
-        return clonedTable;
-    };
-    
-    // Example usage
 
     const captureTable = () => {
         const table = document.getElementById('myTable');
@@ -308,7 +281,7 @@ function Eleve() {
                                 <option key={classe.id} value={classe.id}>{classe.libelle}</option>
                             ))}
                         </select>
-                        <input type="file" name="photo" onChange={handleInputChange} />
+                        <input type="file" accept="image/*" name="photo" onChange={handleInputChange} />
                     </ModalBody>
 
                     <ModalFooter>

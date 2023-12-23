@@ -39,6 +39,20 @@ function Presence() {
 
     const qrRef = useRef(null);
     const fileInputRef = useRef(null);
+
+
+    const onScanSuccess = (result) => {
+        setScanResult(result);
+        // You can handle the scanned result here, for example, send it to an API or perform some action.
+        alert(scanResult);
+    };
+
+    const onScanError = (error) => {
+        console.error('Scan error:', error);
+        // Handle scan errors here
+    };
+
+
     const handleFilterChange = (e) => {
         setFilterText(e.target.value);
     };
@@ -46,7 +60,7 @@ function Presence() {
     useEffect(() => {
         // This effect will run whenever qrCodeData changes
         setState((prevState) => ({ ...prevState, id_eleve: +qrCodeData }));
-      }, [qrCodeData]);
+    }, [qrCodeData]);
 
 
     const handleFileChange = async (event) => {
@@ -184,9 +198,8 @@ function Presence() {
 
 
     useEffect(() => {
-        if(matieres)
-        {
-            setState({...state, id_matiere: matieres[0]?.id})
+        if (matieres) {
+            setState({ ...state, id_matiere: matieres[0]?.id })
         }
     }, [matieres])
 
@@ -254,9 +267,8 @@ function Presence() {
 
     };
 
-    useEffect(() =>{
-        if(!localStorage.getItem('role'))
-        {
+    useEffect(() => {
+        if (!localStorage.getItem('role')) {
             navigate('/')
         }
     })
@@ -271,7 +283,7 @@ function Presence() {
                 id_eleve,
                 id_matiere
             }).then(() => {
-                setState({...state, id_matiere: matieres[0]?.id})
+                setState({ ...state, id_matiere: matieres[0]?.id })
                 handleClose();
                 toast.success("Ajout avec succès!")
                 getList();
@@ -338,7 +350,18 @@ function Presence() {
                         </select>
 
                         <div className="qrReader" style={{ height: '50%' }}>
-                            <input type="file" accept="image/*" onChange={handleFileChange} />
+                            {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
+                            <QrReader
+                                delay={300}
+                                onError={onScanError}
+                                onScan={onScanSuccess}
+                                onResult={()=>{
+                                    console.log(scanResult)
+                                }}
+                                style={{ width: '10%', height:'10%' }}
+                            />
+
+                            {scanResult && alert(scanResult)}
                             {qrCodeData && <p>QR Code Data: {qrCodeData}</p>}
                             {qrCodeData && <p>Eleve: {id_eleve}</p>}
                         </div>
