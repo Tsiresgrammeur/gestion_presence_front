@@ -42,9 +42,12 @@ function Presence() {
 
 
     const onScanSuccess = (result) => {
+        if(result){
+
         setScanResult(result);
         // You can handle the scanned result here, for example, send it to an API or perform some action.
-        alert(scanResult);
+        console.log(scanResult);
+        }
     };
 
     const onScanError = (error) => {
@@ -350,18 +353,20 @@ function Presence() {
                         </select>
 
                         <div className="qrReader" style={{ height: '50%' }}>
-                            {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
+                            <input type="file" accept="image/*" onChange={handleFileChange} /> 
                             <QrReader
-                                delay={300}
-                                onError={onScanError}
-                                onScan={onScanSuccess}
-                                onResult={()=>{
-                                    console.log(scanResult)
-                                }}
-                                style={{ width: '10%', height:'10%' }}
+                                onResult={(result, error) => {
+                                    if (!!result) {
+                                    setScanResult(result?.text);
+                                    }
+                                     if (!!error) {
+                                    console.info(error);
+                                    }
+                                    }}
+                                    style={{ width: '100%' }}
                             />
 
-                            {scanResult && alert(scanResult)}
+                            <p>{scanResult}</p>
                             {qrCodeData && <p>QR Code Data: {qrCodeData}</p>}
                             {qrCodeData && <p>Eleve: {id_eleve}</p>}
                         </div>
@@ -376,6 +381,10 @@ function Presence() {
 
                         <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
                             Ajouter
+                        </Button>
+
+                        <Button style={{ fontFamily: "Century gothic" }} variant='warning'>
+                            Finir
                         </Button>
 
                     </ModalFooter>
