@@ -66,6 +66,13 @@ function Presence() {
     }, [qrCodeData]);
 
 
+    useEffect(() => {
+        // This effect will run whenever qrCodeData changes
+        if(scanResult)
+        setState((prevState) => ({ ...prevState, id_eleve: +scanResult }));
+    }, [scanResult]);
+
+
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
 
@@ -284,7 +291,8 @@ function Presence() {
         else {
             api.post('/presence', {
                 id_eleve,
-                id_matiere
+                id_matiere,
+                status:"présent"
             }).then(() => {
                 setState({ ...state, id_matiere: matieres[0]?.id })
                 handleClose();
@@ -353,11 +361,13 @@ function Presence() {
                         </select>
 
                         <div className="qrReader" style={{ height: '50%' }}>
-                            <input type="file" accept="image/*" onChange={handleFileChange} /> 
+                            {/* <input type="file" accept="image/*" onChange={handleFileChange} />  */}
                             <QrReader
                                 onResult={(result, error) => {
                                     if (!!result) {
                                     setScanResult(result?.text);
+
+                                    handleSubmit();
                                     }
                                      if (!!error) {
                                     console.info(error);
@@ -367,6 +377,7 @@ function Presence() {
                             />
 
                             <p>{scanResult}</p>
+                            <p>{id_eleve}</p>
                             {qrCodeData && <p>QR Code Data: {qrCodeData}</p>}
                             {qrCodeData && <p>Eleve: {id_eleve}</p>}
                         </div>
