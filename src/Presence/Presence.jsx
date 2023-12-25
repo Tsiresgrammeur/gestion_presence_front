@@ -16,14 +16,16 @@ import { useNavigate } from "react-router-dom";
 function Presence() {
     const initialState = {
         id_matiere: 0,
-        id_eleve: 0
+        id_eleve: 0,
+        classe_id: 0
     }
     const [filterText, setFilterText] = useState('');
     const [state, setState] = useState(initialState)
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const { id_matiere, id_eleve } = state;
+    const { id_matiere, id_eleve, classe_id } = state;
     const [presences, setPresences] = useState([]);
     const [matieres, setMatieres] = useState([]);
+    const [elevesFiltered, setEleveFiltered] = useState([]);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -42,11 +44,11 @@ function Presence() {
 
 
     const onScanSuccess = (result) => {
-        if(result){
+        if (result) {
 
-        setScanResult(result);
-        // You can handle the scanned result here, for example, send it to an API or perform some action.
-        console.log(scanResult);
+            setScanResult(result);
+            // You can handle the scanned result here, for example, send it to an API or perform some action.
+            console.log(scanResult);
         }
     };
 
@@ -68,9 +70,17 @@ function Presence() {
 
     useEffect(() => {
         // This effect will run whenever qrCodeData changes
-        if(scanResult)
-        setState((prevState) => ({ ...prevState, id_eleve: +scanResult }));
+        if (scanResult) {
+
+            setState((prevState) => ({ ...prevState, id_eleve: +scanResult }));
+
+        }
     }, [scanResult]);
+
+    useEffect(() => {
+        if (state.id_eleve)
+            handleSubmit();
+    }, [state.id_eleve])
 
 
     const handleFileChange = async (event) => {
@@ -150,7 +160,6 @@ function Presence() {
         api.get("/matiere").then(function (response) {
             setMatieres(response.data)
         });
-
 
     }
 
@@ -234,10 +243,33 @@ function Presence() {
         }
     };
 
+    useEffect(() => {
+        if (state.classe_id != 0) {
+            console.log("eleve", state.classe_id)
+            getEleveByClasse(state.classe_id)
+            console.log("byClasse", elevesFiltered);
+        }
+    }, [state.classe_id])
+
+    useEffect(() => {
+        // Assuming 'id_matiere' is a string, convert it to integer for comparison
+        const selectedMatiereId = parseInt(state.id_matiere);
+        const currentMatiere = matieres.find(item => item.id === selectedMatiereId);
+
+        if (currentMatiere) {
+            console.log(currentMatiere);
+            setState(prevState => ({ ...prevState, classe_id: currentMatiere.classe_id }));
+        }
+    }, [state.id_matiere, matieres]);
+
+    const getEleveByClasse = (id) => {
+        api.get("/eleve/classe/" + id).then(function (response) {
+            setEleveFiltered(response.data)
+        });
+    }
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setState({ ...state, [name]: value });
-
     }
 
     const closeEditModal = () => {
@@ -283,19 +315,17 @@ function Presence() {
         }
     })
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!id_eleve) {
+    const handleSubmit = () => {
+        if (!id_eleve || !id_matiere) {
             toast.error("Complétez les champs!")
         }
         else {
             api.post('/presence', {
                 id_eleve,
                 id_matiere,
-                status:"présent"
+                status: "présent"
             }).then(() => {
                 setState({ ...state, id_matiere: matieres[0]?.id })
-                handleClose();
                 toast.success("Ajout avec succès!")
                 getList();
             }).catch((err) => { handleClose(); toast.error(err.response.data) });
@@ -356,7 +386,7 @@ function Presence() {
                         <select className="form-select form-select-lg mb-3" aria-label="Classe" style={{ width: '100%' }}
                             name='id_matiere' value={id_matiere} onChange={handleInputChange}>
                             {matieres.map((matiere) => (
-                                <option key={matiere.id} value={matiere.id}>{matiere.libelle}</option>
+                                <option key={matiere.id} value={matiere.id}>{matiere.libelle} {matiere.classe_id}</option>
                             ))}
                         </select>
 
@@ -365,15 +395,14 @@ function Presence() {
                             <QrReader
                                 onResult={(result, error) => {
                                     if (!!result) {
-                                    setScanResult(result?.text);
+                                        setScanResult(result?.text);
 
-                                    handleSubmit();
                                     }
-                                     if (!!error) {
-                                    console.info(error);
+                                    if (!!error) {
+                                        console.info(error);
                                     }
-                                    }}
-                                    style={{ width: '100%' }}
+                                }}
+                                style={{ width: '100%' }}
                             />
 
                             <p>{scanResult}</p>
@@ -394,7 +423,7 @@ function Presence() {
                             Ajouter
                         </Button>
 
-                        <Button style={{ fontFamily: "Century gothic" }} variant='warning'>
+                        <Button style={{ fontFamily: "Century gothic" }} variant='warning' onClick={console.log('finir', elevesFiltered)}>
                             Finir
                         </Button>
 
