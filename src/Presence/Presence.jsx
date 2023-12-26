@@ -327,6 +327,7 @@ function Presence() {
             }).then(() => {
                 setState({ ...state, id_matiere: matieres[0]?.id })
                 toast.success("Ajout avec succès!")
+                handleDeleteStudent(id_eleve);
                 getList();
             }).catch((err) => { handleClose(); toast.error(err.response.data) });
         }
@@ -366,6 +367,12 @@ function Presence() {
             })
         }
     }
+
+    const handleDeleteStudent = (idToDelete) => {
+        // Filter out the student with the matching id
+        const updatedStudents = elevesFiltered.filter((student) => student.id !== idToDelete);
+        setEleveFiltered(updatedStudents);
+      };
 
     const filteredData = presences.filter(item => {
         const values = Object.values(item).join('').toLowerCase();
@@ -423,7 +430,7 @@ function Presence() {
                             Ajouter
                         </Button>
 
-                        <Button style={{ fontFamily: "Century gothic" }} variant='warning' onClick={console.log('finir', elevesFiltered)}>
+                        <Button style={{ fontFamily: "Century gothic" }} variant='warning' onClick={()=>{console.log('finir', elevesFiltered)}}>
                             Finir
                         </Button>
 
