@@ -333,6 +333,20 @@ function Presence() {
         }
     }
 
+    const handleFinishSubmit = () => {
+        if (elevesFiltered) {
+            api.post('/absence', {
+                eleves: elevesFiltered,
+                id_matiere
+            }).then(() => {
+                setState({ ...state, id_matiere: matieres[0]?.id })
+                toast.success("Ajout avec succès!")
+                handleClose();
+                getList();
+            }).catch((err) => { handleClose(); toast.error(err.response.data) });
+        }
+    }
+
     const captureTable = () => {
         const table = document.getElementById('myTable');
 
@@ -430,7 +444,7 @@ function Presence() {
                             Ajouter
                         </Button>
 
-                        <Button style={{ fontFamily: "Century gothic" }} variant='warning' onClick={()=>{console.log('finir', elevesFiltered)}}>
+                        <Button style={{ fontFamily: "Century gothic" }} variant='warning' onClick={handleFinishSubmit}>
                             Finir
                         </Button>
 
