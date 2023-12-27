@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
+import { toast } from 'react-toastify';
+import "font-awesome/css/font-awesome.css";
 import Button from 'react-bootstrap/Button'
 import * as FaIcons from 'react-icons/fa';
 import * as AiIcons from 'react-icons/ai';
@@ -7,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SidebarData } from './SidebarData';
 import './Navbar.css';
 import { IconContext } from 'react-icons';
+import api from '../../api'
 import Logo from './logoENI.png'
 import Notification from './Notification'
 
@@ -17,11 +19,30 @@ function Navbar() {
     localStorage.getItem('role') ? setLogged(true) : setLogged(false)
   }, [localStorage.getItem('role')])
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: 'Nouvelle notification 1' },
-    { id: 2, message: 'Nouvelle notification 2' },
-    // ... ajoutez d'autres notifications ici
-  ]);
+  const [notifications, setNotifications] = useState([]);
+
+  const getNotifications = () => {
+      api.get("/notification").then(function (response) {
+          setNotifications(response.data)
+      });
+  }
+
+  const markNotificationAsSeen = (id) =>{
+    api.put("/notification/" + id, {
+  }).then((response) => {
+      if (response.status === 200) {
+          getNotifications();
+      }
+      else {
+          toast.error("Il y a sûrement une erreur")
+      }
+  })
+  }
+
+  useEffect(() => {
+    getNotifications();
+    console.log('notif', notifications)
+  },[])
 
   const navigate = useNavigate()
   const showSidebar = () => setSidebar(!sidebar);
@@ -48,12 +69,11 @@ function Navbar() {
 
           {logged ? <div className='menu-bars'><FaIcons.FaBell/>  
             <ul className='autocomplete-list'>
-
-              <li  class="autocomplete-list-item">transition</li>
-              <li  class="autocomplete-list-item">president </li>
-              <li  class="autocomplete-list-item">lorem     </li>
-              <li  class="autocomplete-list-item">ipsum     </li>
-
+              {
+                notifications.map((notification, index) => (
+                  <li key={index} className="autocomplete-list-item" onClick={() => markNotificationAsSeen(notification.id)}>{notification.texte}{' '} <button className='btn btn-danger'><i className="fa fa-trash"></i> </button> </li>
+                ))
+              }
             </ul>
 
 

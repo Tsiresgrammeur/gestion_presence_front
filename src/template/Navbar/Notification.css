@@ -1,0 +1,23 @@
+.autocomplete-list{
+    padding: 0;
+    background: rgb(255, 255, 255);
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 10px;
+    list-style-type: none;
+    max-height: 300px;
+    min-width: 20%;
+    max-width: 20%;
+    overflow-y: scroll;
+    -webkit-box-shadow: 0px 0px 6px 0px #000000af; 
+    box-shadow: 0px 0px 6px 0px #000000af;
+  }
+  
+  .autocomplete-list-item{
+    cursor: pointer;
+    padding: 5px 20px;
+  }
+  
+  .autocomplete-list-item:hover{
+    background: rgb(170, 170, 170);
+  }
