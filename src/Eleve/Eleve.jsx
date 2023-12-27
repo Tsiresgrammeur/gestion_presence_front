@@ -471,7 +471,7 @@ function Eleve() {
                                 </tr>
                             ) : (
                                 filteredData.map((eleve, index) => (
-                                    <tr key={index}>
+                                    <tr key={index} className={eleve.absence_number >=3 ? "high": ""}>
                                         <td>{eleve.nom}</td>
                                         <td style={{ textAlign: "center" }}>{eleve.prenom}</td>
                                         <td style={{ textAlign: "center" }}>{eleve.libelle}</td>

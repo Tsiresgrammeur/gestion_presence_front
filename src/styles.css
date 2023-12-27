@@ -1368,6 +1368,9 @@ pre {
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.05); }
 
+.table-striped tbody tr.high{
+  background-color: orange; }
+
 .table-hover tbody tr:hover {
   color: #212529;
   background-color: rgba(0, 0, 0, 0.075); }
