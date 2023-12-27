@@ -54,7 +54,7 @@ function Login() {
                             <input type="password" name="password" id="password" className="input-text" placeholder="Mot de passe" required value={password} onChange={handleInputChange} />
                             <i className="fas fa-lock"></i>
                         </div>
-                        <Container className='p-4'>
+                        <Container className='p-5'>
                             <Button type="submit" variant="primary" size="md" active>
                                 Se connecter
                             </Button>{' '}

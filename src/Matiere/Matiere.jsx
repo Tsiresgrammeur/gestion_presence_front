@@ -242,7 +242,7 @@ function Matiere() {
                             Fermer
                         </Button>
 
-                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
+                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
                             Ajouter
                         </Button>
 
@@ -311,7 +311,7 @@ function Matiere() {
                                 Fermer
                             </Button>
 
-                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
+                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
                                 Modifier
                             </Button>
                         </ModalFooter>
@@ -323,7 +323,7 @@ function Matiere() {
                 <div className='row mt-5'>
                     <div className="col btn-container" style={{ display: 'flex' }}>
 
-                        <button className='btn btn-primary btn-lg' id='btn_ajouter' onClick={handleShow}>
+                        <button className='btn btn-success btn-lg' id='btn_ajouter' onClick={handleShow}>
                             AJOUTER &nbsp; <i className='fa fa-plus'></i>
                         </button>
 
@@ -366,7 +366,7 @@ function Matiere() {
                                         <td>
                                             <button className="btn btn-danger" onClick={() => showDeleteModal(matiere.id)}><i className="fa fa-trash"></i></button>
 
-                                            <button className="btn btn-success" onClick={() => showEditModal(matiere.id)}><i className="fa fa-edit"></i></button>
+                                            <button className="btn btn-primary" onClick={() => showEditModal(matiere.id)}><i className="fa fa-edit"></i></button>
                                         </td>
                                     </tr>
                                 ))

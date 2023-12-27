@@ -15,6 +15,7 @@ import Notification from './Notification'
 function Navbar() {
   const [sidebar, setSidebar] = useState(false);
   const [logged, setLogged] = useState(false)
+  const [eleveWithAbsence, setEleveWithAbsence] = useState([]);
   useEffect(() => {
     localStorage.getItem('role') ? setLogged(true) : setLogged(false)
   }, [localStorage.getItem('role')])
@@ -67,17 +68,18 @@ function Navbar() {
             </Link>
           </div>
 
-          {logged ? <div className='menu-bars'><FaIcons.FaBell/>  
+          {/* {logged ? <div className='menu-bars'><FaIcons.FaBell/>  
             <ul className='autocomplete-list'>
               {
                 notifications.map((notification, index) => (
-                  <li key={index} className="autocomplete-list-item" onClick={() => markNotificationAsSeen(notification.id)}>{notification.texte}{' '} <button className='btn btn-danger'><i className="fa fa-trash"></i> </button> </li>
+                  <li key={index} className="autocomplete-list-item" onClick={() => markNotificationAsSeen(notification.id)}><div>{notification.texte}{' '}{' '}  <button className='btn btn-danger'><i className="fa fa-trash"></i> </button> </div></li>
                 ))
               }
             </ul>
 
 
-          <Button variant='danger' onClick={logout}>Se déconnecter</Button> </div> : ''}
+          <Button variant='danger' onClick={logout}>Se déconnecter</Button> </div> : ''} */}
+          {logged ? <Button variant='danger' onClick={logout}>Se déconnecter</Button> : ''}
         </div>
 
         <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>

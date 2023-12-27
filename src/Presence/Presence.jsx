@@ -451,7 +451,7 @@ function Presence() {
                             Fermer
                         </Button>
 
-                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
+                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
                             Ajouter
                         </Button>
 
@@ -508,7 +508,7 @@ function Presence() {
                                 Fermer
                             </Button>
 
-                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
+                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
                                 Modifier
                             </Button>
                         </ModalFooter>
@@ -520,7 +520,7 @@ function Presence() {
                 <div className='row mt-5'>
                     <div className="col btn-container" style={{ display: 'flex' }}>
 
-                        <button className='btn btn-primary' id='btn_ajouter' onClick={handleShow}>
+                        <button className='btn btn-success' id='btn_ajouter' onClick={handleShow}>
                             AJOUTER &nbsp; <i className='fa fa-plus'></i>
                         </button>
 
@@ -565,7 +565,7 @@ function Presence() {
                                             {/* <button className="btn btn-info" onClick={() => showCardModal(presence.id)}><i className="fa fa-id-card-o"></i></button> */}
                                             <button className="btn btn-danger" onClick={() => showDeleteModal(presence.id)}><i className="fa fa-trash"></i></button>
 
-                                            <button className="btn btn-success" onClick={() => showEditModal(presence.id)}><i className="fa fa-edit"></i></button>
+                                            <button className="btn btn-primary" onClick={() => showEditModal(presence.id)}><i className="fa fa-edit"></i></button>
                                         </td>
                                     </tr>
                                 ))

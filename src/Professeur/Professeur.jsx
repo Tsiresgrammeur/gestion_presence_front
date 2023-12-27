@@ -210,7 +210,7 @@ function Professeur() {
                             Fermer
                         </Button>
 
-                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
+                        <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
                             Ajouter
                         </Button>
                     </ModalFooter>
@@ -273,7 +273,7 @@ function Professeur() {
                                 Fermer
                             </Button>
 
-                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='success'>
+                            <Button type="submit" style={{ fontFamily: "Century gothic" }} variant='primary'>
                                 Modifier
                             </Button>
                         </ModalFooter>
@@ -284,7 +284,7 @@ function Professeur() {
             <div className="container">
                 <div className='row mt-5'>
                     <div className='col btn-container' style={{ display: 'flex' }}>
-                        <button className='btn btn-primary' id='btn_ajouter' onClick={handleShow}>
+                        <button className='btn btn-success' id='btn_ajouter' onClick={handleShow}>
                             AJOUTER &nbsp; <i className='fa fa-plus'></i>
                         </button>
 
@@ -323,7 +323,7 @@ function Professeur() {
                                         <td>
                                             <button className="btn btn-danger" onClick={() => showDeleteModal(professeur.id)}><i className="fa fa-trash"></i></button>
 
-                                            <button className="btn btn-success" onClick={() => showEditModal(professeur.id)}><i className="fa fa-edit"></i></button>
+                                            <button className="btn btn-primary" onClick={() => showEditModal(professeur.id)}><i className="fa fa-edit"></i></button>
                                         </td>
                                     </tr>
                                 ))
