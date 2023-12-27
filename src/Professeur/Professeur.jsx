@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button'
 import ModalDelete from "../template/ModalDelete";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import domtoimage from 'dom-to-image';
 import { useNavigate } from "react-router-dom";
 function Professeur() {
     const initialState = {
@@ -16,8 +17,9 @@ function Professeur() {
     }
     const [state, setState] = useState(initialState)
     const [filterText, setFilterText] = useState('');
-    const {nom, prenom} = state;
+    const { nom, prenom } = state;
     const [professeurs, setProfesseurs] = useState([]);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [show, setShow] = useState(false);
     const handleShow = () => setShow(true);
     const [numItem, setNumItem] = useState(1);
@@ -29,7 +31,7 @@ function Professeur() {
 
     const handleClose = () => {
 
-        setState({ nom: "",prenom:""});
+        setState({ nom: "", prenom: "" });
         setShow(false)
     };
 
@@ -62,9 +64,8 @@ function Professeur() {
 
     }
 
-    useEffect(() =>{
-        if(!localStorage.getItem('role'))
-        {
+    useEffect(() => {
+        if (!localStorage.getItem('role')) {
             navigate('/')
         }
     })
@@ -78,13 +79,15 @@ function Professeur() {
 
     const captureTable = () => {
         const table = document.getElementById('myTable');
-
-        html2canvas(table, { allowTaint: true, useCORS: true }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 10, 10);
-            pdf.save('table.pdf');
-        });
+        domtoimage.toPng(table)
+            .then(function (dataUrl) {
+                const pdf = new jsPDF();
+                pdf.addImage(dataUrl, 'PNG', 10, 10);
+                pdf.save('table.pdf');
+            })
+            .catch(function (error) {
+                console.error('Error capturing table:', error);
+            });
     };
 
     const hideConfirmationModal = () => {
@@ -108,6 +111,25 @@ function Professeur() {
 
     };
 
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+
+        // Sort the data
+        const sortedData = [...professeurs].sort((a, b) => {
+            if (direction === 'ascending') {
+                return a[key] > b[key] ? 1 : -1;
+            } else {
+                return a[key] < b[key] ? 1 : -1;
+            }
+        });
+
+        setProfesseurs(sortedData);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!nom) {
@@ -118,7 +140,7 @@ function Professeur() {
                 nom,
                 prenom
             }).then(() => {
-                setState({ nom: "", prenom:"" });
+                setState({ nom: "", prenom: "" });
                 handleClose();
                 toast.success("Ajout avec succès!")
                 getList();
@@ -141,7 +163,7 @@ function Professeur() {
                 prenom
             }).then((response) => {
                 if (response.status === 200) {
-                    setState({ nom: "", prenom:"" });
+                    setState({ nom: "", prenom: "" });
                     toast.success("Modification avec succès")
                     getList();
                     onClose();
@@ -156,7 +178,7 @@ function Professeur() {
     return (
         <div>
 
-             <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose}>
                 <form onSubmit={handleSubmit}>
                     <ModalBody>
                         <ModalTitle className='text-center'>
@@ -179,7 +201,7 @@ function Professeur() {
                             name="prenom"
                             placeholder="Prénom"
                             value={prenom}
-                            
+
                             onChange={handleInputChange} /><br />
                     </ModalBody>
 
@@ -261,7 +283,7 @@ function Professeur() {
 
             <div className="container">
                 <div className='row mt-5'>
-                    <div className='col btn-container' style={{display:'flex'}}>
+                    <div className='col btn-container' style={{ display: 'flex' }}>
                         <button className='btn btn-primary' id='btn_ajouter' onClick={handleShow}>
                             AJOUTER &nbsp; <i className='fa fa-plus'></i>
                         </button>
@@ -283,8 +305,8 @@ function Professeur() {
                     <table id="myTable" class="table table-striped">
                         <thead>
                             <tr>
-                                <th style={{ textAlign: "center", width: "50px",}}>Nom</th>
-                                <th style={{ textAlign: "center", width: "300px" }}>Prénom</th>
+                                <th style={{ textAlign: "center", width: "50px", }} onClick={() => requestSort('libelle')}>Nom</th>
+                                <th style={{ textAlign: "center", width: "300px" }} onClick={() => requestSort('libelle')} >Prénom</th>
                                 <th style={{ textAlign: "center", width: "150px" }}><i className="fa fa-cog"></i></th>
                             </tr>
                         </thead>
@@ -309,7 +331,7 @@ function Professeur() {
                         </tbody>
                     </table>
                 </div>
-                </div>
+            </div>
         </div>
     )
 }

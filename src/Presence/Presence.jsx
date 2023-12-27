@@ -10,6 +10,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import jsQR from 'jsqr';
 import QRCode from "qrcode";
+import domtoimage from 'dom-to-image';
 import { QrReader } from 'react-qr-reader';
 import { useNavigate } from "react-router-dom";
 
@@ -317,7 +318,7 @@ function Presence() {
 
     const handleSubmit = () => {
         if (!id_eleve || !id_matiere) {
-            toast.error("Complétez les champs!")
+            toast.error("Ce Qr code n'est pas celle d'un élève")
         }
         else {
             api.post('/presence', {
@@ -349,13 +350,15 @@ function Presence() {
 
     const captureTable = () => {
         const table = document.getElementById('myTable');
-
-        html2canvas(table, { allowTaint: true, useCORS: true }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 10, 10);
-            pdf.save('table.pdf');
-        });
+        domtoimage.toPng(table)
+            .then(function (dataUrl) {
+                const pdf = new jsPDF();
+                pdf.addImage(dataUrl, 'PNG', 10, 10);
+                pdf.save('table.pdf');
+            })
+            .catch(function (error) {
+                console.error('Error capturing table:', error);
+            });
     };
 
 
@@ -383,10 +386,9 @@ function Presence() {
     }
 
     const handleDeleteStudent = (idToDelete) => {
-        // Filter out the student with the matching id
         const updatedStudents = elevesFiltered.filter((student) => student.id !== idToDelete);
         setEleveFiltered(updatedStudents);
-      };
+    };
 
     const filteredData = presences.filter(item => {
         const values = Object.values(item).join('').toLowerCase();
@@ -533,6 +535,7 @@ function Presence() {
                                 <th style={{ textAlign: "center", width: "300px" }} onClick={() => requestSort('prenom')}>Prénom</th>
                                 <th style={{ textAlign: "center", width: "50px", }} onClick={() => requestSort('libelle')}>Matière</th>
                                 <th style={{ textAlign: "center", width: "50px" }} onClick={() => requestSort('classe_libelle')}>Classe</th>
+                                <th style={{ textAlign: "center", width: "50px" }} onClick={() => requestSort('status')}>Status</th>
                                 <th style={{ textAlign: "center", width: "150px" }}><i className="fa fa-cog"></i></th>
                             </tr>
                         </thead>
@@ -548,6 +551,7 @@ function Presence() {
                                         <td style={{ textAlign: "center" }}>{presence.prenom}</td>
                                         <td style={{ textAlign: "center" }}>{presence.libelle}</td>
                                         <td style={{ textAlign: "center" }}>{presence.classe_libelle}</td>
+                                        <td style={{ textAlign: "center" }}>{presence.status}</td>
                                         <td>
                                             {/* <button className="btn btn-info" onClick={() => showCardModal(presence.id)}><i className="fa fa-id-card-o"></i></button> */}
                                             <button className="btn btn-danger" onClick={() => showDeleteModal(presence.id)}><i className="fa fa-trash"></i></button>

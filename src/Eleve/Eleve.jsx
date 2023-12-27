@@ -30,6 +30,8 @@ function Eleve() {
     const { nom, prenom, classe_id, libelle, photo } = state;
     const [eleves, setEleves] = useState([]);
     const [classes, setClasses] = useState([]);
+    const [presences, setPresences] = useState([]);
+    const [eleveWithAbsence, setEleveWithAbsence] = useState([]);
     const [show, setShow] = useState(false);
     const handleClose = () => {
         setState({ nom: "", prenom: "", classe_id: classes[0]?.id, libelle: "" });
@@ -62,6 +64,12 @@ function Eleve() {
 
     }
 
+    const getPresence = () => {
+        api.get("/presence").then(function (response) {
+            setPresences(response.data)
+        });
+    }
+
     const generateQrCode = async (id) => {
         try {
             const response = await QRCode.toDataURL(String(id))
@@ -88,7 +96,31 @@ function Eleve() {
     useEffect(() => {
         getList();
         getClasse();
+        getPresence();
     }, [])
+
+    useEffect(() =>{
+        getAbsenceNumber();
+    }, eleves)
+
+    const getAbsenceNumber = () => {
+
+        const absenceCountMap = {};
+
+        presences.forEach(presence => {
+            const eleveId = presence.id_eleve;
+            if(presence.status ==='absent')
+            absenceCountMap[eleveId] = (absenceCountMap[eleveId] || 0) + 1;
+        });
+
+        const updatedEleves = eleves.map(eleve => {
+            const eleveId = eleve.id;
+            const absenceNumber = absenceCountMap[eleveId] || 0;
+            return { ...eleve, absence_number: absenceNumber };
+        });
+
+        setEleveWithAbsence(updatedEleves);
+    }
 
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -205,15 +237,15 @@ function Eleve() {
 
     const captureTable = () => {
         const table = document.getElementById('myTable');
-    domtoimage.toPng(table)
-    .then(function (dataUrl) {
-        const pdf = new jsPDF();
-        pdf.addImage(dataUrl, 'PNG', 10, 10);
-        pdf.save('table.pdf');
-    })
-    .catch(function (error) {
-        console.error('Error capturing table:', error);
-    });
+        domtoimage.toPng(table)
+            .then(function (dataUrl) {
+                const pdf = new jsPDF();
+                pdf.addImage(dataUrl, 'PNG', 10, 10);
+                pdf.save('table.pdf');
+            })
+            .catch(function (error) {
+                console.error('Error capturing table:', error);
+            });
     };
 
 
@@ -241,7 +273,7 @@ function Eleve() {
         }
     }
 
-    const filteredData = eleves.filter(item => {
+        const filteredData = eleveWithAbsence.filter(item => {
         const values = Object.values(item).join('').toLowerCase();
         return values.includes(filterText.toLowerCase());
     });
@@ -428,6 +460,7 @@ function Eleve() {
                                 <th style={{ textAlign: "center", width: "50px", }} onClick={() => requestSort('nom')}>Nom</th>
                                 <th style={{ textAlign: "center", width: "300px" }} onClick={() => requestSort('prenom')}>Prénom</th>
                                 <th style={{ textAlign: "center", width: "50px" }} onClick={() => requestSort('libelle')}>Classe</th>
+                                <th style={{ textAlign: "center", width: "50px" }} onClick={() => requestSort('absence_number')}>Nombre d'absence</th>
                                 <th style={{ textAlign: "center", width: "150px" }}><i className="fa fa-cog"></i></th>
                             </tr>
                         </thead>
@@ -442,6 +475,7 @@ function Eleve() {
                                         <td>{eleve.nom}</td>
                                         <td style={{ textAlign: "center" }}>{eleve.prenom}</td>
                                         <td style={{ textAlign: "center" }}>{eleve.libelle}</td>
+                                        <td style={{ textAlign: "center" }}>{eleve.absence_number}</td>
                                         <td>
                                             <button className="btn btn-info" onClick={() => showCardModal(eleve.id)}><i className="fa fa-id-card-o"></i></button>
                                             <button className="btn btn-danger" onClick={() => showDeleteModal(eleve.id)}><i className="fa fa-trash"></i></button>

@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button'
 import ModalDelete from "../template/ModalDelete";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import domtoimage from 'dom-to-image';
 import { useNavigate } from "react-router-dom";
 
 function Matiere() {
@@ -63,15 +64,13 @@ function Matiere() {
     }
 
     useEffect(() => {
-        if(classes)
-        {
-            setState({...state, classe_id: classes[0]?.id})
+        if (classes) {
+            setState({ ...state, classe_id: classes[0]?.id })
         }
     }, [classes])
 
-    useEffect(() =>{
-        if(!localStorage.getItem('role'))
-        {
+    useEffect(() => {
+        if (!localStorage.getItem('role')) {
             navigate('/')
         }
     })
@@ -122,18 +121,18 @@ function Matiere() {
         setShowEdit(true);
     };
 
-
     const captureTable = () => {
         const table = document.getElementById('myTable');
-
-        html2canvas(table, { allowTaint: true, useCORS: true }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 10, 10);
-            pdf.save('table.pdf');
-        });
+        domtoimage.toPng(table)
+            .then(function (dataUrl) {
+                const pdf = new jsPDF();
+                pdf.addImage(dataUrl, 'PNG', 10, 10);
+                pdf.save('table.pdf');
+            })
+            .catch(function (error) {
+                console.error('Error capturing table:', error);
+            });
     };
-
     const hideConfirmationModal = () => {
         setDisplayConfirmationModal(false);
     };
@@ -322,7 +321,7 @@ function Matiere() {
 
             <div className="container">
                 <div className='row mt-5'>
-                    <div className="col btn-container" style={{display:'flex'}}>
+                    <div className="col btn-container" style={{ display: 'flex' }}>
 
                         <button className='btn btn-primary btn-lg' id='btn_ajouter' onClick={handleShow}>
                             AJOUTER &nbsp; <i className='fa fa-plus'></i>
