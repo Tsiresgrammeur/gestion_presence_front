@@ -26,6 +26,7 @@ function Presence() {
     const { id_matiere, id_eleve, classe_id } = state;
     const [presences, setPresences] = useState([]);
     const [matieres, setMatieres] = useState([]);
+    const [eleves, setEleves] = useState([]);
     const [elevesFiltered, setEleveFiltered] = useState([]);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -164,6 +165,12 @@ function Presence() {
 
     }
 
+    const getEleve = () => {
+        api.get('/eleve').then(function (response){
+            setEleves(response.data)
+        })
+    }
+    
     const onFileInputChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -214,6 +221,7 @@ function Presence() {
     useEffect(() => {
         getList();
         getMatiere();
+        getEleve();
     }, [])
 
 
@@ -245,12 +253,17 @@ function Presence() {
     };
 
     useEffect(() => {
-        if (state.classe_id != 0) {
-            console.log("eleve", state.classe_id)
-            getEleveByClasse(state.classe_id)
-            console.log("byClasse", elevesFiltered);
-        }
-    }, [state.classe_id])
+        const fetchData = async () => {
+          if (state.classe_id !== 0) {
+            console.log("matiere", state.id_matiere);
+            const updatedEleves = await getEleveByClasse(state.classe_id);
+            console.log("byClasse", updatedEleves);
+            setEleveFiltered(updatedEleves);
+          }
+        };
+    
+        fetchData();
+      }, [state.classe_id]);
 
     useEffect(() => {
         // Assuming 'id_matiere' is a string, convert it to integer for comparison
@@ -264,10 +277,10 @@ function Presence() {
     }, [state.id_matiere, matieres]);
 
     const getEleveByClasse = (id) => {
-        api.get("/eleve/classe/" + id).then(function (response) {
-            setEleveFiltered(response.data)
-        });
-    }
+        const updatedEleves = eleves.filter((student) => student.classe_id === id);
+        return updatedEleves;
+      };
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setState({ ...state, [name]: value });
@@ -326,7 +339,6 @@ function Presence() {
                 id_matiere,
                 status: "présent"
             }).then(() => {
-                setState({ ...state, id_matiere: matieres[0]?.id })
                 toast.success("Ajout avec succès!")
                 handleDeleteStudent(id_eleve);
                 getList();
@@ -420,9 +432,6 @@ function Presence() {
                                     if (!!result) {
                                         setScanResult(result?.text);
 
-                                    }
-                                    if (!!error) {
-                                        console.info(error);
                                     }
                                 }}
                                 style={{ width: '100%' }}
