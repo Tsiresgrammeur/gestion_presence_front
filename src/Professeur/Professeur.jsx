@@ -291,6 +291,7 @@ function Professeur() {
                         <button className='btn btn-secondary' onClick={captureTable}>
                             Générer PDF &nbsp; <i className='fa fa-file-pdf-o'></i>
                         </button>
+
                     </div>
 
                     <Form.Group>
